@@ -1,3 +1,20 @@
+> ### This is a fork
+>
+> This repository is a fork of **[Aider-AI/aider](https://github.com/Aider-AI/aider)**
+> by Paul Gauthier and the Aider contributors, licensed under Apache 2.0.
+>
+> **What this fork adds:** an [`offline/`](offline/) directory containing tooling to build a
+> self-contained, air-gapped installation bundle for Windows x64, targeting a
+> self-hosted [vLLM](https://github.com/vllm-project/vllm) OpenAI-compatible server.
+> Nothing in `aider/` itself is modified; the only upstream file touched is
+> `MANIFEST.in`, which gains a `prune offline` line so the new directory never
+> ships inside the PyPI sdist.
+>
+> See [`offline/README.md`](offline/README.md) for the build, transfer and install runbook.
+>
+> For the upstream project, its documentation and its issue tracker, go to
+> <https://github.com/Aider-AI/aider> and <https://aider.chat>.
+
 <p align="center">
     <a href="https://aider.chat/"><img src="https://aider.chat/assets/logo.svg" alt="Aider Logo" width="300"></a>
 </p>

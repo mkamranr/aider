@@ -1,0 +1,4 @@
+# Build staging and output. Also covered by the repo root .gitignore ("build"
+# and "dist/"), repeated here so the intent survives a change up there.
+build/
+dist/

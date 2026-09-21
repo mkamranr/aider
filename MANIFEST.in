@@ -18,3 +18,8 @@ recursive-exclude aider/website/assets *
 recursive-exclude aider/website *.js
 recursive-exclude aider/website *.html
 recursive-exclude aider/website *.yml
+
+# The air-gapped bundle tooling is a separate deliverable, not part of the
+# distribution. Without this, setuptools_scm's git file-finder would ship it
+# inside the sdist on PyPI.
+prune offline
