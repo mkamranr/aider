@@ -5,6 +5,12 @@ gap, and install aider on a Windows x64 machine that has **no internet and no
 package mirror**. Aider then talks to a **vLLM OpenAI-compatible server on the
 LAN** and makes no other outbound calls.
 
+**Prebuilt bundles are published on the
+[releases page](https://github.com/mkamranr/aider/releases/latest)** — if one
+matches the aider version you want, skip straight to
+[section 2, Transfer](#2-transfer). Build your own when you need a newer aider,
+a different Python minor version, or an extra.
+
 > **About this directory.** `aider` is developed by Paul Gauthier and the Aider
 > contributors at <https://github.com/Aider-AI/aider> (Apache 2.0), with
 > documentation at <https://aider.chat>. This `offline/` directory is an

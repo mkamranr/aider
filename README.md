@@ -10,6 +10,11 @@
 > `MANIFEST.in`, which gains a `prune offline` line so the new directory never
 > ships inside the PyPI sdist.
 >
+> **Download the prebuilt bundle:** [latest release](https://github.com/mkamranr/aider/releases/latest)
+> — grab the `.zip` and its `.sha256`, copy both to the air-gapped machine, and run
+> `install.ps1`. The target needs only git; Python and every dependency are inside.
+> You can also build it yourself with `offline\build-bundle.ps1`.
+>
 > See [`offline/README.md`](offline/README.md) for the build, transfer and install runbook.
 >
 > For the upstream project, its documentation and its issue tracker, go to
