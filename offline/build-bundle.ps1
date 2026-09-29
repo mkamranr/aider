@@ -69,19 +69,41 @@ Invoke-Native 'git' @('-C', $RepoRoot, 'rev-parse', '--is-inside-work-tree') | O
 # setuptools_scm derives the version from tags, and the sdist file list from
 # `git ls-files`. Both must work or the wheel is silently broken.
 & git -C $RepoRoot fetch --tags --force 2>&1 | Out-Null
-$describe = & git -C $RepoRoot describe --tags --dirty 2>&1
+
+# Derive the version ONLY from upstream release tags (v1.2.3 style).
+#
+# setuptools_scm describes with `--match "*[0-9]*"`, which matches any tag
+# containing a digit -- including fork-local tags such as the release tag
+# "offline-bundle-20260921". Its default tag_regex would then read that as
+# version "20260921", producing a wheel numbered 20260921.x. Pinning
+# SETUPTOOLS_SCM_PRETEND_VERSION from a v-only describe makes the build
+# immune to whatever tags this fork carries, and makes it reproducible.
+$describe = & git -C $RepoRoot describe --tags --dirty --long --match "v[0-9]*" 2>&1
 if ($LASTEXITCODE -ne 0) {
     if (-not $PretendVersion) {
-        throw ("No reachable git tags (git describe failed). setuptools_scm cannot derive a version.`n" +
-               "Fix with: git fetch --tags --force   (or re-clone without --depth)`n" +
+        throw ("No upstream version tags reachable (git describe --match 'v[0-9]*' failed).`n" +
+               "setuptools_scm cannot derive a version.`n" +
+               "Fix with: git fetch --tags --force upstream   (or re-clone without --depth)`n" +
                "Or pass -PretendVersion 0.86.3")
     }
-    Write-Warn "No tags reachable; using -PretendVersion $PretendVersion"
+    Write-Warn "No upstream tags reachable; using -PretendVersion $PretendVersion"
     $env:SETUPTOOLS_SCM_PRETEND_VERSION = $PretendVersion
     $describe = "(pretend:$PretendVersion)"
+} elseif ($PretendVersion) {
+    $env:SETUPTOOLS_SCM_PRETEND_VERSION = $PretendVersion
+    Write-Info "git describe: $describe  (overridden by -PretendVersion $PretendVersion)"
 } else {
-    if ($PretendVersion) { $env:SETUPTOOLS_SCM_PRETEND_VERSION = $PretendVersion }
+    # --long always yields <tag>-<distance>-g<hash>[-dirty]
+    if ("$describe" -notmatch '^v(?<base>.+)-(?<dist>\d+)-g(?<hash>[0-9a-f]+)(?<dirty>-dirty)?$') {
+        throw "Could not parse git describe output '$describe'. Pass -PretendVersion to override."
+    }
+    $base = $Matches['base']; $dist = $Matches['dist']; $hash = $Matches['hash']
+    # Mirrors setuptools_scm's node-and-date scheme, e.g. 0.86.3.dev55+g257041214
+    $derived = "$base$dist+g$hash"
+    if ($Matches['dirty']) { $derived = $derived + ".d" + (Get-Date -Format 'yyyyMMdd') }
+    $env:SETUPTOOLS_SCM_PRETEND_VERSION = $derived
     Write-Info "git describe: $describe"
+    Write-Info "pinned version: $derived"
 }
 
 # Untracked/modified files under aider\ will be MISSING from the wheel, because

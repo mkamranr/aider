@@ -236,6 +236,16 @@ rollback.
 `requirements.txt`, so two builds on different days can differ. The locked file
 is the reproducibility record.
 
+**Careful with tags on this fork.** setuptools_scm derives the aider version by
+running `git describe --match "*[0-9]*"`, which matches *any* tag containing a
+digit. A fork-local tag such as the release tag `offline-bundle-20260921` would
+therefore be picked as the version source, and setuptools_scm's default
+`tag_regex` reads it as version `20260921` — yielding a wheel numbered
+`20260921.x`. `build-bundle.ps1` guards against this by describing with
+`--match "v[0-9]*"` and pinning `SETUPTOOLS_SCM_PRETEND_VERSION` itself, so
+builds stay correct no matter what tags the fork carries. Do not remove that
+guard, and do not rely on a bare `git describe` here to tell you the version.
+
 Adding an extra later means a second `pip download -r
 requirements/requirements-<extra>.txt` in step 5. Be aware that `help` pulls
 `torch` from a separate index (`download.pytorch.org/whl/cpu`) and adds roughly
